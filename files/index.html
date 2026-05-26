@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sparkboard ✨ — capture, refine & roadmap your ideas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Nunito:wght@400;600;700;800&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* ----------  Design tokens  ---------- */
+  :root {
+    --blush:        #FADADD;
+    --blush-deep:   #F4B6C2;
+    --lavender:     #E5D4F1;
+    --lavender-deep:#C8B6E2;
+    --cream:        #FFF6EA;
+    --cream-deep:   #FBE8CC;
+    --sage:         #D2E4CC;
+    --sage-deep:    #A7CBA0;
+    --peach:        #FFDCC3;
+    --rose:         #E37A99;
+    --rose-soft:    #F5A5BA;
+    --plum:         #4A3B52;
+    --plum-soft:    #6E5C75;
+    --ink:          #3A2E40;
+    --paper:        #FFFBF5;
+    --paper-warm:   #FDF4EA;
+    --border:       rgba(74, 59, 82, 0.08);
+    --border-strong:rgba(74, 59, 82, 0.14);
+    --shadow-sm:    0 2px 8px rgba(180, 130, 160, 0.10);
+    --shadow-md:    0 8px 24px rgba(180, 130, 160, 0.14);
+    --shadow-lg:    0 16px 40px rgba(180, 130, 160, 0.20);
+    --radius-sm:    12px;
+    --radius-md:    18px;
+    --radius-lg:    28px;
+    --radius-xl:    36px;
+
+    --cat-business: #E8B86D;
+    --cat-creative: #E37A99;
+    --cat-tech:     #B19CD9;
+    --cat-growth:   #88B988;
+    --cat-lifestyle:#F4A988;
+    --cat-general:  #A8C5E2;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Nunito', system-ui, sans-serif;
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.55;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(250, 218, 221, 0.55), transparent 32%),
+      radial-gradient(circle at 88% 12%, rgba(229, 212, 241, 0.55), transparent 30%),
+      radial-gradient(circle at 75% 88%, rgba(210, 228, 204, 0.55), transparent 35%),
+      radial-gradient(circle at 10% 92%, rgba(255, 220, 195, 0.45), transparent 30%);
+    background-attachment: fixed;
+  }
+
+  /* Decorative floating sparkles */
+  .sparkle-layer {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .sparkle-layer span {
+    position: absolute; font-size: 18px; opacity: 0.45;
+    animation: float 9s ease-in-out infinite;
+  }
+  .sparkle-layer span:nth-child(1) { top: 8%;  left: 6%;  animation-delay: 0s;   }
+  .sparkle-layer span:nth-child(2) { top: 20%; left: 92%; animation-delay: 1.5s; }
+  .sparkle-layer span:nth-child(3) { top: 65%; left: 4%;  animation-delay: 3s;   font-size: 14px; }
+  .sparkle-layer span:nth-child(4) { top: 78%; left: 94%; animation-delay: 4.5s; }
+  .sparkle-layer span:nth-child(5) { top: 42%; left: 50%; animation-delay: 2.2s; font-size: 12px; opacity: 0.3; }
+  .sparkle-layer span:nth-child(6) { top: 88%; left: 40%; animation-delay: 5.8s; }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg);   opacity: 0.4; }
+    50%      { transform: translateY(-18px) rotate(15deg); opacity: 0.7; }
+  }
+
+  /* ----------  Layout shell  ---------- */
+  .shell {
+    position: relative; z-index: 1;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 36px 28px 80px;
+  }
+
+  /* ----------  Header  ---------- */
+  header.brand {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.7s ease both;
+  }
+  .brand-mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px 8px 16px;
+    background: rgba(255, 251, 245, 0.7);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    box-shadow: var(--shadow-sm);
+    font-family: 'Caveat', cursive;
+    font-size: 22px;
+    color: var(--plum);
+    margin-bottom: 16px;
+  }
+  .brand-mark .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--rose), var(--lavender-deep));
+    box-shadow: 0 0 10px rgba(227, 122, 153, 0.6);
+  }
+  h1.brand-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 6vw, 4rem);
+    color: var(--plum);
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin-bottom: 14px;
+  }
+  h1.brand-title em {
+    font-style: italic;
+    color: var(--rose);
+    position: relative;
+  }
+  h1.brand-title em::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0; right: 0;
+    height: 8px;
+    background: var(--blush);
+    border-radius: 999px;
+    z-index: -1;
+    opacity: 0.7;
+  }
+  .brand-sub {
+    font-size: 1.05rem;
+    color: var(--plum-soft);
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  /* ----------  Capture card  ---------- */
+  .capture {
+    background: linear-gradient(155deg, var(--paper) 0%, var(--paper-warm) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 36px clamp(24px, 5vw, 48px);
+    box-shadow: var(--shadow-md);
+    max-width: 760px;
+    margin: 0 auto 64px;
+    position: relative;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+  .capture::before {
+    content: '🌸';
+    position: absolute;
+    top: -22px; left: 32px;
+    font-size: 32px;
+    transform: rotate(-12deg);
+    filter: drop-shadow(0 4px 6px rgba(180, 130, 160, 0.25));
+  }
+  .capture::after {
+    content: '✨';
+    position: absolute;
+    bottom: -16px; right: 36px;
+    font-size: 26px;
+    transform: rotate(8deg);
+    filter: drop-shadow(0 4px 6px rgba(180, 130, 160, 0.25));
+  }
+  .capture h2 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    font-size: 1.7rem;
+    color: var(--plum);
+    margin-bottom: 6px;
+  }
+  .capture h2 .accent {
+    font-family: 'Caveat', cursive;
+    color: var(--rose);
+    font-size: 1.9rem;
+  }
+  .capture p.hint {
+    color: var(--plum-soft);
+    font-size: 0.95rem;
+    margin-bottom: 22px;
+  }
+  textarea.idea-input {
+    width: 100%;
+    min-height: 110px;
+    padding: 18px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea.idea-input::placeholder { color: #B7A6BE; font-style: italic; }
+  textarea.idea-input:focus {
+    outline: none;
+    border-color: var(--rose-soft);
+    box-shadow: 0 0 0 4px rgba(245, 165, 186, 0.20);
+  }
+  .capture-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 18px;
+  }
+  .seed-row {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    font-size: 0.85rem;
+  }
+  .seed-chip {
+    background: var(--blush);
+    color: var(--plum);
+    border: 1px solid transparent;
+    padding: 6px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    transition: transform 0.15s, background 0.2s;
+  }
+  .seed-chip:nth-child(2) { background: var(--lavender); }
+  .seed-chip:nth-child(3) { background: var(--sage); }
+  .seed-chip:nth-child(4) { background: var(--peach); }
+  .seed-chip:hover { transform: translateY(-2px) rotate(-1deg); }
+
+  /* ----------  Buttons  ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 26px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.98rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: transform 0.18s, box-shadow 0.18s, background 0.2s;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--rose-soft) 100%);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(227, 122, 153, 0.35);
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(227, 122, 153, 0.45);
+  }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--plum);
+    border: 1.5px solid var(--border-strong);
+    padding: 11px 22px;
+  }
+  .btn-ghost:hover { background: var(--cream); border-color: var(--lavender-deep); }
+  .btn-soft {
+    background: var(--lavender);
+    color: var(--plum);
+  }
+  .btn-soft:hover {
+    background: var(--lavender-deep);
+    transform: translateY(-2px);
+  }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+  /* ----------  Section heading  ---------- */
+  .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 0 auto 28px;
+    max-width: 1240px;
+  }
+  .section-heading h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    font-size: 1.7rem;
+    color: var(--plum);
+  }
+  .section-heading h3 .accent {
+    font-family: 'Caveat', cursive;
+    color: var(--rose);
+    font-size: 1.9rem;
+  }
+  .section-heading .meta {
+    font-size: 0.9rem;
+    color: var(--plum-soft);
+  }
+  .divider {
+    border: none;
+    height: 14px;
+    background-image:
+      radial-gradient(circle, var(--blush-deep) 2px, transparent 2.5px),
+      radial-gradient(circle, var(--lavender-deep) 2px, transparent 2.5px),
+      radial-gradient(circle, var(--sage-deep) 2px, transparent 2.5px);
+    background-size: 22px 14px;
+    background-position: 0 6px, 11px 6px, 22px 6px;
+    background-repeat: repeat-x;
+    opacity: 0.55;
+    max-width: 220px;
+    margin: 0 auto 36px;
+  }
+
+  /* ----------  Pinterest masonry board  ---------- */
+  .board {
+    column-count: 4;
+    column-gap: 20px;
+  }
+  @media (max-width: 1100px) { .board { column-count: 3; } }
+  @media (max-width: 780px)  { .board { column-count: 2; } }
+  @media (max-width: 480px)  { .board { column-count: 1; } }
+
+  .card {
+    break-inside: avoid;
+    display: inline-block;
+    width: 100%;
+    margin: 0 0 20px;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px 20px 18px;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.25s cubic-bezier(.2,.7,.3,1.2), box-shadow 0.25s;
+    animation: cardIn 0.5s ease both;
+  }
+  .card:hover {
+    transform: translateY(-6px) rotate(-0.5deg);
+    box-shadow: var(--shadow-md);
+  }
+  .card.tone-business  { background: linear-gradient(160deg, #FFF6E5 0%, #FFEFD1 100%); }
+  .card.tone-creative  { background: linear-gradient(160deg, #FFEEF3 0%, #FFD8E3 100%); }
+  .card.tone-tech      { background: linear-gradient(160deg, #F1EAFB 0%, #E0CFF6 100%); }
+  .card.tone-growth    { background: linear-gradient(160deg, #EDF5EA 0%, #D6E9CF 100%); }
+  .card.tone-lifestyle { background: linear-gradient(160deg, #FFEFE2 0%, #FFD9BF 100%); }
+  .card.tone-general   { background: linear-gradient(160deg, #EBF2F9 0%, #D4E3F2 100%); }
+
+  .card-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.75);
+    color: var(--plum);
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+  .card-badge .swatch {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .card h4 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--plum);
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  .card p.excerpt {
+    color: var(--plum-soft);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .card .phase-pills {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 12px;
+  }
+  .phase-pill {
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid var(--border);
+    padding: 3px 9px;
+    border-radius: 8px;
+    font-size: 0.72rem;
+    color: var(--plum);
+    font-weight: 600;
+  }
+  .card-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.78rem; color: var(--plum-soft);
+    border-top: 1px dashed var(--border-strong);
+    padding-top: 10px;
+  }
+  .card-meta .pin {
+    font-family: 'Caveat', cursive;
+    font-size: 1.05rem;
+    color: var(--rose);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    background: rgba(255, 251, 245, 0.6);
+    border: 2px dashed var(--border-strong);
+    border-radius: var(--radius-lg);
+    color: var(--plum-soft);
+  }
+  .empty-state .big {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 12px;
+  }
+  .empty-state h4 {
+    font-family: 'Playfair Display', serif;
+    color: var(--plum);
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+  }
+
+  /* ----------  Q&A view  ---------- */
+  .qa-stage {
+    max-width: 760px;
+    margin: 0 auto;
+    animation: fadeUp 0.5s ease both;
+  }
+  .pinned-idea {
+    background: var(--cream-deep);
+    border: 1px dashed var(--rose-soft);
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    margin-bottom: 24px;
+    position: relative;
+    color: var(--plum);
+    font-size: 0.95rem;
+  }
+  .pinned-idea .pin-icon {
+    position: absolute;
+    top: -12px; left: 18px;
+    font-size: 22px;
+    transform: rotate(-12deg);
+  }
+  .pinned-idea .label {
+    font-family: 'Caveat', cursive;
+    color: var(--rose);
+    font-size: 1.1rem;
+    margin-bottom: 2px;
+    display: block;
+  }
+
+  .progress-wrap {
+    margin-bottom: 28px;
+  }
+  .progress-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+    color: var(--plum-soft);
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+  .progress-row .cat-tag {
+    display: inline-flex; gap: 6px; align-items: center;
+  }
+  .progress-bar {
+    height: 10px;
+    background: var(--cream-deep);
+    border-radius: 999px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-bar .fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rose) 0%, var(--lavender-deep) 100%);
+    border-radius: 999px;
+    transition: width 0.45s cubic-bezier(.2,.7,.3,1.2);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.4);
+  }
+
+  .qa-history {
+    margin-bottom: 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .bubble {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    animation: bubbleIn 0.4s ease both;
+  }
+  .bubble.q {
+    align-self: flex-start;
+    background: var(--lavender);
+    color: var(--plum);
+    border-bottom-left-radius: 6px;
+  }
+  .bubble.a {
+    align-self: flex-end;
+    background: var(--blush);
+    color: var(--plum);
+    border-bottom-right-radius: 6px;
+    font-weight: 600;
+  }
+
+  .question-card {
+    background: linear-gradient(160deg, var(--paper) 0%, var(--paper-warm) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    animation: bubbleIn 0.45s ease both;
+  }
+  .question-card::before {
+    content: '💭';
+    position: absolute;
+    top: -18px; left: 24px;
+    font-size: 28px;
+    filter: drop-shadow(0 3px 6px rgba(180, 130, 160, 0.3));
+  }
+  .question-card .q-label {
+    font-family: 'Caveat', cursive;
+    font-size: 1.1rem;
+    color: var(--rose);
+    margin-bottom: 4px;
+    display: block;
+  }
+  .question-card .q-text {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    font-size: 1.35rem;
+    color: var(--plum);
+    line-height: 1.35;
+    margin-bottom: 18px;
+  }
+  .question-card textarea {
+    width: 100%;
+    min-height: 90px;
+    padding: 14px 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    color: var(--ink);
+    background: var(--paper);
+    border: 2px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    resize: vertical;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .question-card textarea:focus {
+    outline: none;
+    border-color: var(--rose-soft);
+    box-shadow: 0 0 0 4px rgba(245, 165, 186, 0.18);
+  }
+  .qa-actions {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 18px;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .qa-actions .skip {
+    background: none; border: none;
+    color: var(--plum-soft);
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-underline-offset: 4px;
+  }
+  .qa-actions .skip:hover { color: var(--rose); }
+
+  /* ----------  Roadmap view  ---------- */
+  .roadmap-stage {
+    max-width: 840px;
+    margin: 0 auto;
+    animation: fadeUp 0.5s ease both;
+  }
+  .roadmap-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .roadmap-header .label {
+    font-family: 'Caveat', cursive;
+    color: var(--rose);
+    font-size: 1.4rem;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .roadmap-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    color: var(--plum);
+    line-height: 1.2;
+    margin-bottom: 14px;
+  }
+  .roadmap-header .summary {
+    color: var(--plum-soft);
+    max-width: 560px;
+    margin: 0 auto 16px;
+    font-size: 1rem;
+  }
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px; top: 14px; bottom: 14px;
+    width: 3px;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--rose-soft) 0 6px,
+      transparent 6px 12px
+    );
+    border-radius: 2px;
+  }
+  .phase {
+    position: relative;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 22px 24px;
+    margin-bottom: 22px;
+    box-shadow: var(--shadow-sm);
+    animation: fadeUp 0.5s ease both;
+  }
+  .phase::before {
+    content: attr(data-emoji);
+    position: absolute;
+    left: -32px; top: 20px;
+    width: 26px; height: 26px;
+    background: var(--paper);
+    border: 2px solid var(--rose-soft);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 0 0 4px var(--paper);
+  }
+  .phase h3 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--plum);
+    margin-bottom: 12px;
+  }
+  .phase ul {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .phase li {
+    display: flex; align-items: flex-start; gap: 12px;
+    color: var(--ink);
+    font-size: 0.97rem;
+    line-height: 1.5;
+  }
+  .phase li input[type="checkbox"] {
+    appearance: none;
+    margin-top: 3px;
+    width: 18px; height: 18px;
+    min-width: 18px;
+    border: 2px solid var(--rose-soft);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    background: var(--paper);
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .phase li input[type="checkbox"]:checked {
+    background: var(--rose);
+    border-color: var(--rose);
+  }
+  .phase li input[type="checkbox"]:checked::after {
+    content: '✓';
+    color: #fff;
+    font-size: 13px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .phase li.done span.task-text {
+    text-decoration: line-through;
+    color: var(--plum-soft);
+    opacity: 0.7;
+  }
+
+  .roadmap-actions {
+    display: flex; justify-content: center; gap: 12px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  /* ----------  Modal  ---------- */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(74, 59, 82, 0.45);
+    backdrop-filter: blur(6px);
+    z-index: 100;
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-y: auto;
+    animation: fadeIn 0.25s ease both;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--paper);
+    border-radius: var(--radius-xl);
+    max-width: 720px;
+    width: 100%;
+    padding: 36px clamp(20px, 4vw, 42px);
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    animation: bubbleIn 0.35s ease both;
+  }
+  .modal-close {
+    position: absolute;
+    top: 18px; right: 18px;
+    width: 38px; height: 38px;
+    background: var(--blush);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    color: var(--plum);
+    font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .modal-close:hover { transform: rotate(90deg) scale(1.05); background: var(--rose-soft); color: white; }
+  .modal-meta {
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+    color: var(--plum-soft); font-size: 0.85rem; margin-top: 12px; margin-bottom: 18px;
+  }
+  .modal .qa-recap {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    margin-bottom: 24px;
+  }
+  .modal .qa-recap h5 {
+    font-family: 'Caveat', cursive;
+    color: var(--rose);
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+  .modal .qa-recap dl {
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .modal .qa-recap dt {
+    font-weight: 700; color: var(--plum); font-size: 0.85rem;
+  }
+  .modal .qa-recap dd {
+    color: var(--plum-soft); font-size: 0.9rem; margin-left: 0; padding-left: 12px;
+    border-left: 2px solid var(--blush-deep);
+  }
+
+  .modal-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 20px;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .delete-btn {
+    background: transparent;
+    border: 1.5px solid #E8AAB6;
+    color: #B85870;
+    padding: 9px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    transition: background 0.2s;
+  }
+  .delete-btn:hover { background: #FCEAEE; }
+
+  /* ----------  Toast  ---------- */
+  .toast {
+    position: fixed;
+    bottom: 26px; left: 50%;
+    transform: translateX(-50%) translateY(40px);
+    background: var(--plum);
+    color: var(--paper);
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 200;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ----------  Animations  ---------- */
+  @keyframes fadeUp   { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes bubbleIn { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: none; } }
+  @keyframes cardIn   { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* Mobile fine-tuning */
+  @media (max-width: 580px) {
+    .shell { padding: 24px 16px 60px; }
+    .capture { padding: 28px 20px; }
+    .capture::before { left: 18px; }
+    .question-card { padding: 22px 18px; }
+    .timeline { padding-left: 24px; }
+    .phase::before { left: -24px; }
+    .modal { padding: 28px 18px; }
+    .bubble { max-width: 92%; }
+  }
+</style>
+</head>
+<body>
+<div class="sparkle-layer" aria-hidden="true">
+  <span>✨</span><span>🌸</span><span>💫</span><span>🌷</span><span>✿</span><span>⋆</span>
+</div>
+
+<div class="shell">
+
+  <!-- Brand header -->
+  <header class="brand">
+    <div class="brand-mark"><span class="dot"></span> a soft little planner</div>
+    <h1 class="brand-title">Sparkboard <em>for your ideas</em></h1>
+    <p class="brand-sub">Capture a spark, answer a few cozy questions, and bloom it into a step-by-step roadmap you'll actually follow. 🌸</p>
+  </header>
+
+  <!-- VIEW: Input / Board -->
+  <section id="view-input" class="view active">
+    <div class="capture">
+      <h2>What's on your mind <span class="accent">today?</span></h2>
+      <p class="hint">Drop in any idea — half-formed thoughts welcome. I'll help you shape it.</p>
+      <textarea id="idea-input" class="idea-input" placeholder="e.g., I want to start a small subscription box for handmade candles, or learn watercolor, or build an app to track my reading habits..."></textarea>
+      <div class="capture-actions">
+        <div class="seed-row">
+          <button type="button" class="seed-chip" data-seed="Launch a small Etsy shop selling handmade ceramic mugs">💼 try a business idea</button>
+          <button type="button" class="seed-chip" data-seed="Write and self-publish a short illustrated children's book">🎨 try a creative idea</button>
+          <button type="button" class="seed-chip" data-seed="Build a mobile app that helps friends plan weekly potluck dinners">💻 try a tech idea</button>
+          <button type="button" class="seed-chip" data-seed="Learn to bake sourdough bread well enough to gift loaves to friends">🌱 try a growth idea</button>
+        </div>
+        <button id="submit-idea" class="btn btn-primary">Refine this spark ✨</button>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="section-heading">
+      <h3>Your <span class="accent">idea board</span></h3>
+      <div class="meta" id="board-meta">No ideas saved yet</div>
+    </div>
+
+    <div id="board" class="board"></div>
+  </section>
+
+  <!-- VIEW: Q&A -->
+  <section id="view-qa" class="view">
+    <div class="qa-stage">
+      <div class="pinned-idea">
+        <span class="pin-icon">📌</span>
+        <span class="label">your spark</span>
+        <span id="qa-idea-text"></span>
+      </div>
+
+      <div class="progress-wrap">
+        <div class="progress-row">
+          <span class="cat-tag" id="qa-category-tag"></span>
+          <span id="qa-progress-label">Question 1 of 6</span>
+        </div>
+        <div class="progress-bar"><div class="fill" id="qa-progress-fill" style="width: 0%"></div></div>
+      </div>
+
+      <div class="qa-history" id="qa-history"></div>
+
+      <div class="question-card" id="question-card">
+        <span class="q-label">a gentle question</span>
+        <p class="q-text" id="qa-question-text"></p>
+        <textarea id="qa-answer-input" placeholder="Take your time — anything is a fine starting point..."></textarea>
+        <div class="qa-actions">
+          <button type="button" class="skip" id="qa-skip">skip this one →</button>
+          <div style="display:flex;gap:10px;">
+            <button type="button" class="btn btn-ghost" id="qa-cancel">cancel</button>
+            <button type="button" class="btn btn-primary" id="qa-next">next ✨</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIEW: Roadmap -->
+  <section id="view-roadmap" class="view">
+    <div class="roadmap-stage">
+      <div class="roadmap-header">
+        <span class="label">your blooming roadmap 🌷</span>
+        <h2 id="roadmap-title"></h2>
+        <div id="roadmap-badge-wrap"></div>
+        <p class="summary" id="roadmap-summary"></p>
+      </div>
+
+      <div class="timeline" id="roadmap-phases"></div>
+
+      <div class="roadmap-actions">
+        <button type="button" class="btn btn-ghost" id="roadmap-back">← keep refining</button>
+        <button type="button" class="btn btn-primary" id="roadmap-save">save to my board 💖</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Card detail modal -->
+<div id="modal" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* =====================================================
+   SPARKBOARD — vanilla JS app logic
+   ===================================================== */
+
+/* ---------- Categories & detection ---------- */
+const CATEGORIES = {
+  business: {
+    label: 'Business',
+    emoji: '💼',
+    color: 'var(--cat-business)',
+    tone: 'business',
+    keywords: ['business','startup','company','sell','selling','sale','customer','customers','client','clients','market','marketing','profit','revenue','brand','launch','monetize','monetise','shop','store','etsy','subscription','saas','b2b','b2c','ecommerce','e-commerce','product line','pricing','invoice','agency','freelance','freelancing','consulting','franchise','retail','wholesale','venture','enterprise','service business']
+  },
+  tech: {
+    label: 'Tech & Apps',
+    emoji: '💻',
+    color: 'var(--cat-tech)',
+    tone: 'tech',
+    keywords: ['app','website','site','software','code','coding','program','programming','developer','build a','platform','api','database','ai','ml','machine learning','algorithm','automation','automate','script','tool','dashboard','plugin','extension','mobile app','web app','ios','android','react','python','javascript','backend','frontend','server','cloud','crypto','blockchain','bot','chatbot']
+  },
+  creative: {
+    label: 'Creative',
+    emoji: '🎨',
+    color: 'var(--cat-creative)',
+    tone: 'creative',
+    keywords: ['art','paint','painting','draw','drawing','sketch','illustrate','illustration','write','writing','novel','book','story','poem','poetry','music','song','songwriting','album','design','craft','crafting','photography','photograph','film','movie','video','animation','animate','ceramic','pottery','knit','knitting','sew','sewing','embroidery','watercolor','watercolour','sculpture','podcast','zine','comic','manga','graphic','blog','blogging','children\'s book','picture book']
+  },
+  growth: {
+    label: 'Personal Growth',
+    emoji: '🌱',
+    color: 'var(--cat-growth)',
+    tone: 'growth',
+    keywords: ['learn','learning','study','studying','course','habit','habits','improve','improvement','skill','master','fitness','exercise','workout','run','running','yoga','health','meditate','meditation','mindful','mindfulness','goal','journal','journaling','read more','reading','language','spanish','french','german','japanese','sourdough','bake','baking','cook','cooking','self-discipline','routine','morning routine','therapy','grow','develop myself']
+  },
+  lifestyle: {
+    label: 'Lifestyle',
+    emoji: '🌷',
+    color: 'var(--cat-lifestyle)',
+    tone: 'lifestyle',
+    keywords: ['travel','trip','vacation','holiday','home','house','apartment','decorate','decor','interior','garden','gardening','fashion','outfit','wardrobe','wedding','party','birthday','celebration','event','plan a','organize','organise','declutter','minimalism','move','moving','renovate','renovation','dating','relationship','family','potluck','dinner party','hosting','meal plan','road trip']
+  }
+};
+
+function detectCategory(text) {
+  const lower = ' ' + text.toLowerCase() + ' ';
+  let best = { key: 'general', score: 0 };
+  for (const [key, cat] of Object.entries(CATEGORIES)) {
+    let score = 0;
+    for (const kw of cat.keywords) {
+      // boundary-ish match
+      const pattern = new RegExp('(^|[^a-z])' + kw.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') + '([^a-z]|$)', 'i');
+      if (pattern.test(lower)) {
+        // weight longer keywords more
+        score += kw.length > 6 ? 2 : 1;
+      }
+    }
+    if (score > best.score) best = { key, score };
+  }
+  return best.score === 0 ? 'general' : best.key;
+}
+
+function categoryMeta(key) {
+  if (key === 'general') return { label: 'General', emoji: '💡', color: 'var(--cat-general)', tone: 'general' };
+  return CATEGORIES[key];
+}
+
+/* ---------- Question banks (per category) ---------- */
+/* Each question can dynamically reference prior answers via {answers.<id>} */
+const QUESTIONS = {
+  business: [
+    { id: 'audience',  text: 'Who is your ideal customer — can you picture one specific person?', placeholder: 'e.g., busy parents in their 30s who love handmade goods…' },
+    { id: 'problem',   text: 'What problem or craving does this solve for {answers.audience|them}?', placeholder: 'e.g., they want unique gifts but hate generic mass-market options…' },
+    { id: 'model',     text: 'How would money flow in? (one-time, subscription, services, etc.)', placeholder: 'e.g., $29 monthly box, or per-item sales, or hourly rate…' },
+    { id: 'timeline',  text: 'What\'s a realistic timeline to launch a first version?', placeholder: 'e.g., 3 months for a soft launch, 6 months for full…' },
+    { id: 'resources', text: 'What resources do you already have — and what\'s missing?', placeholder: 'e.g., I have the craft skills and ~$500 budget; need a website…' },
+    { id: 'unique',    text: 'What makes your version different from what\'s already out there?', placeholder: 'e.g., locally sourced materials, a story-driven brand, smaller batches…' }
+  ],
+  tech: [
+    { id: 'users',     text: 'Who would use this — and what do they care about?', placeholder: 'e.g., small groups of friends planning casual meals…' },
+    { id: 'core',      text: 'If you stripped it to one essential feature, what would it be?', placeholder: 'e.g., a shared dish list that prevents duplicate sign-ups…' },
+    { id: 'platform',  text: 'Where should {answers.users|users} use it — web, iOS, Android, all of them?', placeholder: 'e.g., mobile-first web app, then a real iOS app later…' },
+    { id: 'stack',     text: 'Any tech stack preferences, or are you open?', placeholder: 'e.g., I know React and want to try Supabase; or "no preference"…' },
+    { id: 'timeline',  text: 'What\'s your timeline to get a working prototype?', placeholder: 'e.g., 6 weekends to MVP, 3 months to public beta…' },
+    { id: 'distribution', text: 'How will {answers.users|people} actually discover this?', placeholder: 'e.g., word of mouth in my niche community, ProductHunt, TikTok…' }
+  ],
+  creative: [
+    { id: 'medium',    text: 'What medium or format will this take?', placeholder: 'e.g., a 32-page illustrated picture book in watercolor…' },
+    { id: 'theme',     text: 'What\'s the heart of it — the message, mood, or story?', placeholder: 'e.g., a cozy tale about a shy mushroom finding their voice…' },
+    { id: 'audience',  text: 'Who is it for, and where would they encounter it?', placeholder: 'e.g., parents reading bedtime stories to 3–6 year olds…' },
+    { id: 'skill',     text: 'How would you describe your skill level with {answers.medium|this medium} right now?', placeholder: 'e.g., comfortable sketching but new to watercolor; or seasoned…' },
+    { id: 'timeline',  text: 'When would you love to have a finished version in hand?', placeholder: 'e.g., a complete draft in 4 months, polished in 6…' },
+    { id: 'showcase',  text: 'Where do you imagine sharing or showing the finished work?', placeholder: 'e.g., self-published on Amazon, indie bookstores, an Instagram launch…' }
+  ],
+  growth: [
+    { id: 'goal',      text: 'What does "I did it!" look like for you?', placeholder: 'e.g., bake a loaf good enough to gift to a friend without flinching…' },
+    { id: 'why',       text: 'Why does {answers.goal|this goal} matter to you, honestly?', placeholder: 'e.g., I want a tactile hobby and a way to slow down weekends…' },
+    { id: 'time',      text: 'How much time can you give this per week, realistically?', placeholder: 'e.g., 2 hours every Saturday plus 20 min on weeknights…' },
+    { id: 'level',     text: 'Where are you starting from in skill or knowledge?', placeholder: 'e.g., total beginner, or I\'ve dabbled but never stuck with it…' },
+    { id: 'resources', text: 'What learning resources will you lean on?', placeholder: 'e.g., a specific book, a YouTube channel, a friend who knows it…' },
+    { id: 'measure',   text: 'How will you know you\'re actually making progress?', placeholder: 'e.g., a weekly photo log, monthly milestone bakes, a habit tracker…' }
+  ],
+  lifestyle: [
+    { id: 'outcome',   text: 'What does the finished result look or feel like to you?', placeholder: 'e.g., a warm monthly potluck where 6 friends regularly come…' },
+    { id: 'who',       text: 'Who is this for — just you, or others too?', placeholder: 'e.g., me and 4–6 close friends who live nearby…' },
+    { id: 'budget',    text: 'What\'s a comfortable budget range (money + effort)?', placeholder: 'e.g., ~$30/month for hosting, plus a Saturday afternoon to set up…' },
+    { id: 'timeline',  text: 'When would you like to start, and by when?', placeholder: 'e.g., first gathering in 3 weeks, ongoing every month…' },
+    { id: 'style',     text: 'What vibe or aesthetic do you want?', placeholder: 'e.g., low-key, candlelit, no-pressure, BYO-dish…' },
+    { id: 'obstacle',  text: 'What\'s the most likely thing that could trip this up?', placeholder: 'e.g., my apartment is small, or friends have unpredictable schedules…' }
+  ],
+  general: [
+    { id: 'goal',      text: 'In one or two sentences — what does success look like?', placeholder: 'e.g., the thing exists, I\'ve shown it to 10 people, and they liked it…' },
+    { id: 'who',       text: 'Who is this for — yourself, a group, customers, your community?', placeholder: 'e.g., just for me as a creative outlet…' },
+    { id: 'why',       text: 'Why now? What made you think of this lately?', placeholder: 'e.g., I had a conversation last week that stuck with me…' },
+    { id: 'timeline',  text: 'What\'s a realistic timeline to get started — and to finish a first version?', placeholder: 'e.g., start this month, first version in 6 weeks…' },
+    { id: 'resources', text: 'What resources or skills do you already have to work with?', placeholder: 'e.g., a free weekend a month, some savings, a friend who can help…' },
+    { id: 'obstacle',  text: 'What\'s the biggest thing in the way — and what would help?', placeholder: 'e.g., I get overwhelmed by big plans; small daily steps would help…' }
+  ]
+};
+
+/* Resolve {answers.x|fallback} placeholders inside a question/task string */
+function interpolate(template, answers) {
+  return template.replace(/\{answers\.(\w+)(?:\|([^}]*))?\}/g, (m, key, fallback) => {
+    const v = answers[key];
+    if (v && v.trim().length > 0) {
+      // shorten very long answers when injected into a sentence
+      const trimmed = v.trim().replace(/\s+/g, ' ');
+      return trimmed.length > 60 ? trimmed.slice(0, 60).replace(/[,.\s]+$/, '') + '…' : trimmed;
+    }
+    return fallback || 'this';
+  });
+}
+
+/* ---------- Roadmap templates ---------- */
+/* Each template is a function (answers, ideaText) => array of phases */
+const ROADMAPS = {
+  business: (a, idea) => [
+    {
+      title: 'Phase 1 — Research & Validation', emoji: '🔍',
+      tasks: [
+        `Write a one-paragraph pitch describing the idea, focused on {answers.audience|your target customer}.`,
+        `Interview 8–12 people who match "{answers.audience|your audience}" and listen for the actual words they use about {answers.problem|the problem}.`,
+        `Map 3–5 existing competitors or alternatives; note what they do well and where they leave a gap.`,
+        `Decide a clear unique angle (start from "{answers.unique|what makes yours different}") and write it in one sentence.`,
+        `Validate willingness to pay — ask 5 prospects directly if they'd pay {answers.model|for this} and at what price.`
+      ]
+    },
+    {
+      title: 'Phase 2 — Planning & Strategy', emoji: '🗺️',
+      tasks: [
+        `Draft a simple one-page business plan: who, what, how money flows ({answers.model|your pricing model}), and key numbers.`,
+        `Set a realistic launch milestone aligned with your timeline ({answers.timeline|your goal date}).`,
+        `List required resources and identify gaps based on what you have today ({answers.resources|your starting resources}).`,
+        `Choose a brand name, secure a domain, and reserve social handles.`,
+        `Open a separate bank account or budget envelope for the project to track spend cleanly.`
+      ]
+    },
+    {
+      title: 'Phase 3 — Build & Launch (MVP)', emoji: '🚀',
+      tasks: [
+        `Build the smallest possible version that real customers can experience — not the full vision, just the first slice.`,
+        `Set up a simple landing page with an email list and clear call-to-action.`,
+        `Prepare 2–3 sample products or service deliveries to test fulfillment end-to-end.`,
+        `Soft-launch to friends, family, and your network — ask for honest feedback and one referral each.`,
+        `Open public sales/sign-ups with a small launch campaign on the channels {answers.audience|your audience} actually uses.`
+      ]
+    },
+    {
+      title: 'Phase 4 — Grow & Iterate', emoji: '🌱',
+      tasks: [
+        `Talk to your first 10 paying customers; collect testimonials and friction points.`,
+        `Track weekly: revenue, signups, refund/return reasons, and time spent.`,
+        `Double down on the one acquisition channel that is clearly working.`,
+        `Refine pricing or packaging based on real demand signals.`,
+        `Plan the next version: what to add, what to cut, and when to revisit your unique angle.`
+      ]
+    }
+  ],
+
+  tech: (a, idea) => [
+    {
+      title: 'Phase 1 — Requirements & Design', emoji: '✏️',
+      tasks: [
+        `Write a one-paragraph product description: who it's for ({answers.users|your users}) and the one core thing it does ({answers.core|the core feature}).`,
+        `Sketch the 3–5 main screens or flows on paper or in Figma — focus on the happy path first.`,
+        `Define what is explicitly out of scope for v1 (this list matters as much as what's in).`,
+        `Talk to 5 potential users; show them the sketches and capture what confuses them.`,
+        `Pick your platform target for v1 ({answers.platform|your chosen platform}) and stick to it.`
+      ]
+    },
+    {
+      title: 'Phase 2 — Tech Setup & Prototype', emoji: '🔧',
+      tasks: [
+        `Choose your stack ({answers.stack|your preferred tools}) and set up a fresh repo with linting, formatting, and a deploy pipeline.`,
+        `Stand up a minimal "hello world" version deployed to a real URL within the first week.`,
+        `Build the data model on paper before any code — entities, relationships, and key actions.`,
+        `Implement authentication and the single core feature ({answers.core|the core feature}) end-to-end.`,
+        `Add basic analytics so you can see what users actually do.`
+      ]
+    },
+    {
+      title: 'Phase 3 — Development & Testing', emoji: '🛠️',
+      tasks: [
+        `Build the remaining v1 features one at a time; ship each one before starting the next.`,
+        `Write tests for the parts that would be painful to break (auth, payments, data writes).`,
+        `Invite 5–10 beta users from your community; watch them use it without intervening.`,
+        `Fix the top 3 friction points before adding any new feature.`,
+        `Polish the empty states, loading states, and error messages — these define perceived quality.`
+      ]
+    },
+    {
+      title: 'Phase 4 — Launch & Iterate', emoji: '🚀',
+      tasks: [
+        `Prepare launch assets: a short demo video, screenshots, and a clear "why this exists" page.`,
+        `Launch through your planned distribution ({answers.distribution|your launch channel}) on a day you can monitor responses.`,
+        `Set up a feedback channel users can reach in one tap (email, Discord, or a form).`,
+        `Pick one metric that matters most and check it weekly; let it drive what you build next.`,
+        `Plan the next 6 weeks in 2-week cycles, not a giant roadmap.`
+      ]
+    }
+  ],
+
+  creative: (a, idea) => [
+    {
+      title: 'Phase 1 — Inspiration & Concept', emoji: '💡',
+      tasks: [
+        `Build a small inspiration board (Pinterest, a notebook, a folder of references) for the mood of "{answers.theme|your theme}".`,
+        `Write a one-sentence pitch capturing the heart of the work.`,
+        `Decide the scope of v1: page count, length, runtime, dimensions — whatever defines "done".`,
+        `Choose your medium and constraints intentionally ({answers.medium|your medium}).`,
+        `Identify 2–3 reference artists whose work resonates and study one technique from each.`
+      ]
+    },
+    {
+      title: 'Phase 2 — Planning & Sketching', emoji: '📐',
+      tasks: [
+        `Outline the full work in rough form — thumbnails, beats, structure, or a chapter list.`,
+        `Identify the trickiest single piece (a hard scene, a complex page) and try a small test of it.`,
+        `If your skill is still growing ({answers.skill|your current level}), schedule 2–3 small skill-building exercises before starting the real piece.`,
+        `Set up your workspace and materials so starting takes less than 5 minutes.`,
+        `Block recurring creative time on your calendar — protect it like a meeting.`
+      ]
+    },
+    {
+      title: 'Phase 3 — Create & Refine', emoji: '🎨',
+      tasks: [
+        `Work through the piece in order from rough to refined — don't polish any single section until the whole thing exists in rough form.`,
+        `Take photos or scans at each major step; they become both progress markers and shareable content.`,
+        `Share work-in-progress with 2–3 trusted readers/viewers and ask one specific question each time.`,
+        `Schedule a deliberate "rest" — set the work aside for a few days before final edits.`,
+        `Do a final polish pass focused on the parts {answers.audience|your audience} will encounter first.`
+      ]
+    },
+    {
+      title: 'Phase 4 — Share & Showcase', emoji: '🌟',
+      tasks: [
+        `Prepare the work for its venue ({answers.showcase|where you'll share it}) — formats, files, framing, listings.`,
+        `Write a short artist's note or description in your own voice.`,
+        `Build a tiny launch plan: 3 posts, 2 personal messages, 1 ask for a share.`,
+        `Release it; celebrate it for a full day before thinking about what's next.`,
+        `Capture what you learned and what you want to do differently in the next piece.`
+      ]
+    }
+  ],
+
+  growth: (a, idea) => [
+    {
+      title: 'Phase 1 — Clarify & Commit', emoji: '🌱',
+      tasks: [
+        `Write your goal in one specific sentence: "{answers.goal|what success looks like}".`,
+        `Write the deeper reason: "{answers.why|why this matters to you}" — keep it visible.`,
+        `Choose a realistic weekly time commitment ({answers.time|your weekly time}).`,
+        `Define what counts as a "minimum showing-up day" — something so small you can do it on a bad day.`,
+        `Tell one person who will gently ask about it.`
+      ]
+    },
+    {
+      title: 'Phase 2 — Foundation & Routine', emoji: '🧱',
+      tasks: [
+        `Set up your learning kit: tools, books, app, or workspace ({answers.resources|your resources}).`,
+        `Schedule a recurring time block on your calendar and treat it as non-negotiable for 4 weeks.`,
+        `Learn the absolute fundamentals first — assume your current level is "{answers.level|where you are now}" and resist skipping ahead.`,
+        `Create a simple progress log: a notebook page, a checklist, or a habit tracker.`,
+        `Reduce one friction point that makes starting hard (lay out materials the night before, etc.).`
+      ]
+    },
+    {
+      title: 'Phase 3 — Practice & Build', emoji: '🔁',
+      tasks: [
+        `Do the work consistently for 4 weeks before evaluating — short-term feedback is noisy.`,
+        `Each week, deliberately practice one specific sub-skill rather than just "doing the thing".`,
+        `Capture your work or progress weekly in the way you chose ({answers.measure|your progress signal}).`,
+        `Adjust your plan after week 4 based on what's actually working — not what you hoped would work.`,
+        `Find a small community, class, or accountability partner if motivation is dipping.`
+      ]
+    },
+    {
+      title: 'Phase 4 — Showcase & Sustain', emoji: '🌸',
+      tasks: [
+        `Mark progress milestones publicly or privately — celebrate the messy middle, not just the end.`,
+        `Do one "stretch" thing: gift the loaf, run the 5K, post the writing, teach a friend.`,
+        `Reflect honestly: what about your routine truly helped, what was decoration?`,
+        `Decide whether to deepen, broaden, or maintain this skill.`,
+        `Set the next 90-day intention before momentum fades.`
+      ]
+    }
+  ],
+
+  lifestyle: (a, idea) => [
+    {
+      title: 'Phase 1 — Vision & Vibe', emoji: '🌷',
+      tasks: [
+        `Describe what success feels like in one sentence: "{answers.outcome|your desired outcome}".`,
+        `Clarify who this is for ({answers.who|the people involved}).`,
+        `Collect 5–10 inspiration images for the vibe ({answers.style|your aesthetic}).`,
+        `Set a comfortable budget range ({answers.budget|your budget}) and a "do not exceed" ceiling.`,
+        `Identify the one thing that, if it goes well, makes everything else feel right.`
+      ]
+    },
+    {
+      title: 'Phase 2 — Plan & Prep', emoji: '📋',
+      tasks: [
+        `Pick a target date or kickoff window ({answers.timeline|your timeline}) and back-plan from it.`,
+        `Make a short shopping or prep list — only what's actually needed for v1.`,
+        `Identify the most likely obstacle ({answers.obstacle|what could trip this up}) and write your plan to soften it.`,
+        `Communicate clearly with anyone involved — when, what to bring, what to expect.`,
+        `Set up the space the day before so the day-of is calmer.`
+      ]
+    },
+    {
+      title: 'Phase 3 — Execute & Enjoy', emoji: '✨',
+      tasks: [
+        `Do a final pre-flight check the morning of (or the day before).`,
+        `Let go of perfection: aim for "warm and human" over "flawless".`,
+        `Stay present — take a few mental snapshots, not just phone ones.`,
+        `Capture one photo or note for memory's sake, then put the phone away.`,
+        `Thank or acknowledge anyone who helped.`
+      ]
+    },
+    {
+      title: 'Phase 4 — Reflect & Repeat', emoji: '💭',
+      tasks: [
+        `Note what worked, what felt off, and what you'd happily skip next time.`,
+        `Capture any lessons in a place you'll see again before the next round.`,
+        `Decide whether this becomes a one-off, a regular ritual, or something to scale up.`,
+        `If recurring: set the next date now while the energy is fresh.`,
+        `Share something from the experience with someone who'd appreciate it.`
+      ]
+    }
+  ],
+
+  general: (a, idea) => [
+    {
+      title: 'Phase 1 — Discovery & Clarity', emoji: '🔍',
+      tasks: [
+        `Write the idea in one clear paragraph so a friend could understand it without asking questions.`,
+        `Define success in one sentence: "{answers.goal|what done looks like}".`,
+        `Clarify who this is for ({answers.who|the people involved}).`,
+        `Note the deeper "why" behind starting now ({answers.why|why this matters}).`,
+        `List 3 things this idea is explicitly not trying to be.`
+      ]
+    },
+    {
+      title: 'Phase 2 — Preparation', emoji: '🧰',
+      tasks: [
+        `Inventory what you already have to work with ({answers.resources|your resources}).`,
+        `Identify the 2–3 things you most clearly need (skill, tool, time, person, money).`,
+        `Set a realistic first-version timeline ({answers.timeline|your timeline}).`,
+        `Break the work into 3–5 chunks small enough to fit in a single sitting.`,
+        `Schedule the first chunk on your calendar this week.`
+      ]
+    },
+    {
+      title: 'Phase 3 — Execution', emoji: '⚡',
+      tasks: [
+        `Start with the smallest chunk that produces something real and visible.`,
+        `Work in short, consistent sessions — momentum beats intensity.`,
+        `Share an in-progress version with 2–3 people for honest, kind feedback.`,
+        `Address the biggest obstacle directly when you hit it ({answers.obstacle|the likely trip-up}).`,
+        `Finish a complete-but-imperfect v1 before polishing any single part.`
+      ]
+    },
+    {
+      title: 'Phase 4 — Review & Refine', emoji: '🌟',
+      tasks: [
+        `Set the work aside for a few days, then revisit with fresh eyes.`,
+        `List what worked, what didn't, and what surprised you.`,
+        `Decide what version 2 would be — or whether this idea is complete.`,
+        `Capture the lesson in a place you'll actually re-read.`,
+        `Celebrate. Genuinely. You moved an idea into the world.`
+      ]
+    }
+  ]
+};
+
+/* ---------- State ---------- */
+let state = {
+  view: 'input',
+  draft: null,        // { text, category, questions, index, answers }
+  savedIdeas: loadIdeas(),
+  modalOpenId: null
+};
+
+/* ---------- Persistence ---------- */
+function loadIdeas() {
+  try {
+    const raw = localStorage.getItem('sparkboard.ideas.v1');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
+}
+function saveIdeas() {
+  try {
+    localStorage.setItem('sparkboard.ideas.v1', JSON.stringify(state.savedIdeas));
+  } catch (e) {
+    console.warn('Could not persist ideas', e);
+  }
+}
+
+/* ---------- View routing ---------- */
+function setView(name) {
+  state.view = name;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('view-' + name);
+  if (el) el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ---------- Toast ---------- */
+let toastTimer = null;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ---------- Idea board rendering ---------- */
+function renderBoard() {
+  const board = document.getElementById('board');
+  const meta = document.getElementById('board-meta');
+  board.innerHTML = '';
+  if (state.savedIdeas.length === 0) {
+    board.innerHTML = `
+      <div class="empty-state" style="break-inside: avoid;">
+        <span class="big">🌱</span>
+        <h4>Your board is waiting to bloom</h4>
+        <p>Drop your first idea up top — even a half-thought is enough to start.</p>
+      </div>`;
+    meta.textContent = 'No ideas saved yet';
+    return;
+  }
+  meta.textContent = state.savedIdeas.length + ' idea' + (state.savedIdeas.length === 1 ? '' : 's') + ' on your board';
+
+  // newest first
+  const sorted = [...state.savedIdeas].sort((a, b) => b.createdAt - a.createdAt);
+  sorted.forEach(idea => {
+    const meta = categoryMeta(idea.category);
+    const excerpt = idea.text.length > 140 ? idea.text.slice(0, 140).trim() + '…' : idea.text;
+    const phasePills = idea.roadmap.map(p => `<span class="phase-pill">${escapeHtml(p.title.split('—')[0].trim())}</span>`).join('');
+    const dateStr = new Date(idea.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    const card = document.createElement('div');
+    card.className = 'card tone-' + meta.tone;
+    card.dataset.id = idea.id;
+    card.innerHTML = `
+      <span class="card-badge"><span class="swatch" style="background:${meta.color}"></span>${meta.emoji} ${meta.label}</span>
+      <h4>${escapeHtml(idea.title)}</h4>
+      <p class="excerpt">${escapeHtml(excerpt)}</p>
+      <div class="phase-pills">${phasePills}</div>
+      <div class="card-meta">
+        <span>${dateStr} · ${idea.roadmap.reduce((s,p)=>s+p.tasks.length,0)} tasks</span>
+        <span class="pin">tap to open ↗</span>
+      </div>`;
+    card.addEventListener('click', () => openModal(idea.id));
+    board.appendChild(card);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- Capture submission ---------- */
+function startRefinement(text) {
+  const clean = text.trim();
+  if (clean.length < 4) { toast('Add a few more words to your spark 🌸'); return; }
+  const category = detectCategory(clean);
+  const questions = QUESTIONS[category] || QUESTIONS.general;
+  state.draft = {
+    text: clean,
+    category,
+    questions: [...questions],
+    index: 0,
+    answers: {}
+  };
+  renderQA();
+  setView('qa');
+}
+
+/* ---------- Q&A rendering ---------- */
+function renderQA() {
+  const { draft } = state;
+  if (!draft) return;
+  const meta = categoryMeta(draft.category);
+  document.getElementById('qa-idea-text').textContent = draft.text;
+  document.getElementById('qa-category-tag').innerHTML =
+    `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${meta.color};"></span>` +
+    `<span>${meta.emoji} ${meta.label}</span>`;
+
+  const total = draft.questions.length;
+  const current = draft.index;
+  const pct = Math.round((current / total) * 100);
+  document.getElementById('qa-progress-fill').style.width = pct + '%';
+  document.getElementById('qa-progress-label').textContent =
+    current < total
+      ? `Question ${current + 1} of ${total}`
+      : 'All set! Generating your roadmap…';
+
+  // History
+  const hist = document.getElementById('qa-history');
+  hist.innerHTML = '';
+  for (let i = 0; i < current; i++) {
+    const q = draft.questions[i];
+    const a = draft.answers[q.id];
+    const qBubble = document.createElement('div');
+    qBubble.className = 'bubble q';
+    qBubble.textContent = interpolate(q.text, draft.answers);
+    hist.appendChild(qBubble);
+    const aBubble = document.createElement('div');
+    aBubble.className = 'bubble a';
+    aBubble.textContent = (a && a.trim()) ? a : '(skipped)';
+    hist.appendChild(aBubble);
+  }
+
+  // Current question card
+  const card = document.getElementById('question-card');
+  if (current < total) {
+    card.style.display = '';
+    const q = draft.questions[current];
+    document.getElementById('qa-question-text').textContent = interpolate(q.text, draft.answers);
+    const inputEl = document.getElementById('qa-answer-input');
+    inputEl.placeholder = q.placeholder || '…';
+    inputEl.value = draft.answers[q.id] || '';
+    setTimeout(() => inputEl.focus(), 50);
+  } else {
+    card.style.display = 'none';
+    // Auto-advance to roadmap
+    setTimeout(() => buildAndShowRoadmap(), 350);
+  }
+}
+
+function advanceQA(skipped) {
+  const { draft } = state;
+  if (!draft) return;
+  const current = draft.index;
+  if (current < draft.questions.length) {
+    const q = draft.questions[current];
+    const val = document.getElementById('qa-answer-input').value.trim();
+    draft.answers[q.id] = skipped ? '' : val;
+    draft.index++;
+  }
+  renderQA();
+}
+
+/* ---------- Roadmap building ---------- */
+function buildRoadmap(draft) {
+  const builder = ROADMAPS[draft.category] || ROADMAPS.general;
+  const raw = builder(draft.answers, draft.text);
+  return raw.map(phase => ({
+    title: phase.title,
+    emoji: phase.emoji,
+    tasks: phase.tasks.map(t => interpolate(t, draft.answers))
+  }));
+}
+
+function deriveTitle(text) {
+  // First sentence or first 60 chars, trimmed
+  let t = text.split(/[.!?\n]/)[0].trim();
+  if (t.length > 70) t = t.slice(0, 70).trim() + '…';
+  // Strip leading filler
+  t = t.replace(/^(i (want|would like|need|am going|wanna) (to )?|let'?s |i'?m thinking (of|about) |maybe (i should )?|how about )/i, '');
+  // Capitalize first letter
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  return t || 'Untitled idea';
+}
+
+function deriveSummary(draft) {
+  const meta = categoryMeta(draft.category);
+  const goalish = draft.answers.goal || draft.answers.outcome || draft.answers.core || draft.answers.audience || draft.answers.problem;
+  if (goalish) {
+    return `A ${meta.label.toLowerCase()} idea focused on ${goalish.trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 140)}.`;
+  }
+  return `A ${meta.label.toLowerCase()} idea, broken into four manageable phases.`;
+}
+
+function buildAndShowRoadmap() {
+  const { draft } = state;
+  if (!draft) return;
+  const roadmap = buildRoadmap(draft);
+  const title = deriveTitle(draft.text);
+  const summary = deriveSummary(draft);
+  const meta = categoryMeta(draft.category);
+
+  document.getElementById('roadmap-title').textContent = title;
+  document.getElementById('roadmap-summary').textContent = summary;
+  document.getElementById('roadmap-badge-wrap').innerHTML =
+    `<span class="card-badge" style="margin: 0 auto;">
+       <span class="swatch" style="background:${meta.color}"></span>${meta.emoji} ${meta.label}
+     </span>`;
+
+  const container = document.getElementById('roadmap-phases');
+  container.innerHTML = '';
+  roadmap.forEach((phase, i) => {
+    const el = document.createElement('div');
+    el.className = 'phase';
+    el.dataset.emoji = phase.emoji;
+    el.style.animationDelay = (0.08 * i) + 's';
+    el.innerHTML = `
+      <h3>${escapeHtml(phase.title)}</h3>
+      <ul>${phase.tasks.map((t, j) => `
+        <li>
+          <input type="checkbox" data-phase="${i}" data-task="${j}" />
+          <span class="task-text">${escapeHtml(t)}</span>
+        </li>`).join('')}
+      </ul>`;
+    container.appendChild(el);
+  });
+
+  // Stash the just-built roadmap on draft for saving
+  draft.roadmap = roadmap;
+  draft.title = title;
+  draft.summary = summary;
+
+  // Pre-roadmap checkbox toggle (visual only — not saved here)
+  container.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      e.target.closest('li').classList.toggle('done', e.target.checked);
+    });
+  });
+
+  setView('roadmap');
+}
+
+/* ---------- Save idea ---------- */
+function saveCurrentIdea() {
+  const d = state.draft;
+  if (!d || !d.roadmap) return;
+  const idea = {
+    id: 'idea_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+    text: d.text,
+    title: d.title,
+    summary: d.summary,
+    category: d.category,
+    answers: d.answers,
+    questions: d.questions.map(q => ({ id: q.id, text: q.text })),
+    roadmap: d.roadmap.map(p => ({
+      title: p.title, emoji: p.emoji,
+      tasks: p.tasks.map(t => ({ text: t, done: false }))
+    })),
+    createdAt: Date.now()
+  };
+  state.savedIdeas.push(idea);
+  saveIdeas();
+  state.draft = null;
+  renderBoard();
+  setView('input');
+  toast('Saved to your board 💖');
+}
+
+/* ---------- Modal (card detail) ---------- */
+function openModal(id) {
+  const idea = state.savedIdeas.find(i => i.id === id);
+  if (!idea) return;
+  state.modalOpenId = id;
+  const meta = categoryMeta(idea.category);
+  const dateStr = new Date(idea.createdAt).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+  const totalTasks = idea.roadmap.reduce((s, p) => s + p.tasks.length, 0);
+  const doneTasks = idea.roadmap.reduce((s, p) => s + p.tasks.filter(t => t.done).length, 0);
+
+  const recapItems = (idea.questions || []).map((q, i) => {
+    const a = idea.answers[q.id];
+    if (!a || !a.trim()) return '';
+    const qText = interpolate(q.text, idea.answers);
+    return `<dt>${escapeHtml(qText)}</dt><dd>${escapeHtml(a)}</dd>`;
+  }).filter(Boolean).join('');
+
+  const phasesHtml = idea.roadmap.map((phase, i) => `
+    <div class="phase" data-emoji="${phase.emoji}">
+      <h3>${escapeHtml(phase.title)}</h3>
+      <ul>
+        ${phase.tasks.map((t, j) => `
+          <li class="${t.done ? 'done' : ''}">
+            <input type="checkbox" data-idea="${idea.id}" data-phase="${i}" data-task="${j}" ${t.done ? 'checked' : ''} />
+            <span class="task-text">${escapeHtml(t.text)}</span>
+          </li>`).join('')}
+      </ul>
+    </div>`).join('');
+
+  document.getElementById('modal-body').innerHTML = `
+    <span class="card-badge">
+      <span class="swatch" style="background:${meta.color}"></span>${meta.emoji} ${meta.label}
+    </span>
+    <h2 style="font-family:'Playfair Display',serif; color:var(--plum); margin-top:10px; font-size:1.7rem; line-height:1.2;">
+      ${escapeHtml(idea.title)}
+    </h2>
+    <div class="modal-meta">
+      <span>📅 Saved ${dateStr}</span>
+      <span>·</span>
+      <span>✅ ${doneTasks}/${totalTasks} tasks done</span>
+    </div>
+    <p style="color:var(--plum-soft); margin-bottom:18px;">${escapeHtml(idea.summary || '')}</p>
+
+    <div class="qa-recap">
+      <h5>your refinement notes</h5>
+      <p style="color:var(--plum-soft); font-size:0.92rem; margin-bottom:10px;">"${escapeHtml(idea.text)}"</p>
+      ${recapItems ? `<dl>${recapItems}</dl>` : `<p style="color:var(--plum-soft);font-size:0.88rem;">No follow-up answers were saved.</p>`}
+    </div>
+
+    <h4 style="font-family:'Playfair Display',serif; color:var(--plum); font-size:1.25rem; margin-bottom:14px;">Your roadmap</h4>
+    <div class="timeline">${phasesHtml}</div>
+
+    <div class="modal-footer">
+      <button class="delete-btn" id="modal-delete">🗑 remove from board</button>
+      <span style="color:var(--plum-soft); font-size:0.85rem;">progress saves automatically</span>
+    </div>
+  `;
+
+  // Attach task toggling
+  document.querySelectorAll('#modal-body input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const pIdx = parseInt(e.target.dataset.phase);
+      const tIdx = parseInt(e.target.dataset.task);
+      const idea2 = state.savedIdeas.find(i => i.id === id);
+      if (!idea2) return;
+      idea2.roadmap[pIdx].tasks[tIdx].done = e.target.checked;
+      e.target.closest('li').classList.toggle('done', e.target.checked);
+      saveIdeas();
+      // Refresh count in header without full re-render
+      const done = idea2.roadmap.reduce((s, p) => s + p.tasks.filter(t => t.done).length, 0);
+      const total = idea2.roadmap.reduce((s, p) => s + p.tasks.length, 0);
+      const metaEl = document.querySelector('#modal-body .modal-meta');
+      if (metaEl) {
+        const spans = metaEl.querySelectorAll('span');
+        if (spans[2]) spans[2].textContent = `✅ ${done}/${total} tasks done`;
+      }
+    });
+  });
+
+  document.getElementById('modal-delete').addEventListener('click', () => {
+    if (confirm('Remove this idea from your board? This cannot be undone.')) {
+      state.savedIdeas = state.savedIdeas.filter(i => i.id !== id);
+      saveIdeas();
+      renderBoard();
+      closeModal();
+      toast('Idea removed');
+    }
+  });
+
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  document.body.style.overflow = '';
+  state.modalOpenId = null;
+}
+
+/* ---------- Event wiring ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  // Capture
+  document.getElementById('submit-idea').addEventListener('click', () => {
+    startRefinement(document.getElementById('idea-input').value);
+  });
+  document.getElementById('idea-input').addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      startRefinement(e.target.value);
+    }
+  });
+  // Seed chips
+  document.querySelectorAll('.seed-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const ta = document.getElementById('idea-input');
+      ta.value = chip.dataset.seed;
+      ta.focus();
+    });
+  });
+
+  // Q&A
+  document.getElementById('qa-next').addEventListener('click', () => advanceQA(false));
+  document.getElementById('qa-skip').addEventListener('click', () => advanceQA(true));
+  document.getElementById('qa-cancel').addEventListener('click', () => {
+    if (confirm('Discard this spark and go back?')) {
+      state.draft = null;
+      setView('input');
+    }
+  });
+  document.getElementById('qa-answer-input').addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') advanceQA(false);
+  });
+
+  // Roadmap
+  document.getElementById('roadmap-save').addEventListener('click', saveCurrentIdea);
+  document.getElementById('roadmap-back').addEventListener('click', () => {
+    // Go back to last question for tweaking
+    if (state.draft && state.draft.index > 0) {
+      state.draft.index = Math.max(0, state.draft.index - 1);
+    }
+    renderQA();
+    setView('qa');
+  });
+
+  // Modal
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal').addEventListener('click', e => {
+    if (e.target.id === 'modal') closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && state.modalOpenId) closeModal();
+  });
+
+  // First render
+  renderBoard();
+});
+</script>
+</body>
+</html>
